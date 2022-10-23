@@ -1,0 +1,6 @@
+inputs:
+  key: {}
+  path: {}
+runs:
+  using: node16
+  main: action.js
