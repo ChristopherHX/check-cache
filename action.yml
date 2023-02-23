@@ -1,6 +1,9 @@
 inputs:
   key: {}
+  restore-keys: {}
   path: {}
+  enableCrossOsArchive:
+    default: 'false'
 runs:
   using: node16
   main: action.js

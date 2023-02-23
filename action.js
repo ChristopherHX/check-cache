@@ -5,11 +5,20 @@ var utils = require("@actions/cache/lib/internal/cacheUtils");
 (async () => {
     try {
         const key = core.getInput("key");
-        const path = core.getInput("path");
+        var keys = core.getMultilineInput("restore-keys") || [];
+        keys.unshift(key);
+        const path = core.getMultilineInput("path");
+        const enableCrossOsArchive = core.getInput("enableCrossOsArchive").toLowerCase() === "true";
         const compressionMethod = await utils.getCompressionMethod();
-        var cacheResponse = await cacheHttpClient.getCacheEntry([key], [path], { compressionMethod });
+        var cacheResponse = await cacheHttpClient.getCacheEntry(keys, path, { compressionMethod, enableCrossOsArchive });
         if(cacheResponse && cacheResponse.archiveLocation) {
-            core.setOutput("cache-hit", "true");
+            core.setOutput("cache-hit", (!!(
+                cacheResponse.cacheKey &&
+                cacheResponse.cacheKey.localeCompare(key, undefined, {
+                    sensitivity: "accent"
+                }) === 0
+            )).toString());
+            core.setOutput("cache-key", cacheResponse.cacheKey || "");
         }
     } catch {
 
