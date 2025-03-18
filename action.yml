@@ -8,9 +8,14 @@ runs:
   using: composite
   steps:
   - uses: actions/cache/restore@v4
+    id: inner_cache
     with:
       key: ${{ inputs.key }}
       restore-keys: ${{ inputs.restore-keys }}
       path: ${{ inputs.path }}
       enableCrossOsArchive: ${{ inputs.enableCrossOsArchive }}
       lookup-only: true
+outputs:
+  cache-hit:
+    description: the cache is present
+    value: ${{ steps.inner_cache.outputs.cache-hit }}
