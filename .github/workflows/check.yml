@@ -1,0 +1,32 @@
+on:
+  push:
+  workflow_call:
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone Repo
+      uses: actions/checkout@v4
+    - name: Check cache is missing
+      uses: ./
+      with:
+        key: mycachekey-${{ github.run_id }}
+        path: package-lock.json
+      id: check_cache_0
+    - if: steps.check_cache_0.outputs.cache-hit == 'true'
+      run: exit 1
+    - name: Upload cache
+      uses: actions/cache/save@v4
+      id: cache_upload
+      with:
+        path: package-lock.json
+        key: mycachekey-${{ github.run_id }}
+    - name: Check cache is present
+      uses: ./
+      with:
+        key: mycachekey-${{ github.run_id }}
+        path: package-lock.json
+      id: check_cache_1
+    - if: steps.check_cache_1.outputs.cache-hit != 'true'
+      run: exit 1
